@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  web:
+    container_name: website
+    build:
+      context: frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - default
+      - ftb
+    depends_on:
+      - backend
+    restart: on-failure
+
+  backend:
+    container_name: backend
+    build:
+      context: backend
+    ports:
+      - "3001:3001"
+    networks:
+      - db
+      - ftb
+      - default
+    restart: on-failure
+    depends_on:
+      - database
+  database:
+    container_name: postgres
+    build:
+      context: docker_database
+    ports:
+      - "5432:5432"
+    networks:
+      - db
+      - default
+    volumes:
+      - post_db:/var/lib/postgresql/data
+      # - backend/schemas/forum_schema/forum_schema.sql:/docker-entrypoint-initdb.d/init-user-db.sql
+
+networks:
+  db:
+  ftb:
+
+
+volumes:
+  post_db:
